@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_graph"
+    app:startDestination="@id/galleryPage">
+
+    <fragment
+        android:id="@+id/galleryPage"
+        android:name="cn.xu.gallery.GalleryPage"
+        android:label="fragment_gallery_page"
+        tools:layout="@layout/fragment_gallery_page" >
+        <action
+            android:id="@+id/action_galleryPage_to_photoPage"
+            app:destination="@id/photoPage" />
+    </fragment>
+    <fragment
+        android:id="@+id/photoPage"
+        android:name="cn.xu.gallery.PhotoPage"
+        android:label="fragment_photo_page"
+        tools:layout="@layout/fragment_photo_page" />
+</navigation>
