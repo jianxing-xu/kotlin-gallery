@@ -5,9 +5,10 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 
 data class Pixabay(
+    @SerializedName("total_results")
     val totalHits: Int,
+    @SerializedName("photos")
     val hits: Array<PhotoItem>,
-    val total: Int
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -17,7 +18,6 @@ data class Pixabay(
 
         if (totalHits != other.totalHits) return false
         if (!hits.contentEquals(other.hits)) return false
-        if (total != other.total) return false
 
         return true
     }
@@ -25,7 +25,6 @@ data class Pixabay(
     override fun hashCode(): Int {
         var result = totalHits
         result = 31 * result + hits.contentHashCode()
-        result = 31 * result + total
         return result
     }
 }
@@ -34,18 +33,55 @@ data class Pixabay(
 data class PhotoItem(
     @SerializedName(value = "id")
     val photoId: Int,
-
-    @SerializedName(value = "webformatURL")
-    val previewUrl: String?,
-
-    @SerializedName(value = "largeImageURL")
-    val fullUrl: String?
+    @SerializedName("src")
+    val src: Src?,
+    @SerializedName("height")
+    val height: Int,
+    @SerializedName("photographer")
+    val name: String?
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
+        parcel.readParcelable(Src::class.java.classLoader),
+        parcel.readInt(),
+        parcel.readString()
+    ) {
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(photoId)
+        parcel.writeParcelable(src, flags)
+        parcel.writeInt(height)
+        parcel.writeString(name)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<PhotoItem> {
+        override fun createFromParcel(parcel: Parcel): PhotoItem {
+            return PhotoItem(parcel)
+        }
+
+        override fun newArray(size: Int): Array<PhotoItem?> {
+            return arrayOfNulls(size)
+        }
+    }
+
+}
+
+data class Src(
+    @SerializedName("small")
+    val previewUrl: String?,
+    @SerializedName("medium")
+    val fullUrl: String?,
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
         parcel.readString(),
         parcel.readString()
-    )
+    ) {
+    }
 
     override fun describeContents(): Int {
         TODO("Not yet implemented")
@@ -55,12 +91,12 @@ data class PhotoItem(
         TODO("Not yet implemented")
     }
 
-    companion object CREATOR : Parcelable.Creator<PhotoItem> {
-        override fun createFromParcel(parcel: Parcel): PhotoItem {
-            return PhotoItem(parcel)
+    companion object CREATOR : Parcelable.Creator<Src> {
+        override fun createFromParcel(parcel: Parcel): Src {
+            return Src(parcel)
         }
 
-        override fun newArray(size: Int): Array<PhotoItem?> {
+        override fun newArray(size: Int): Array<Src?> {
             return arrayOfNulls(size)
         }
     }

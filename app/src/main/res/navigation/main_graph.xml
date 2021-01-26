@@ -13,10 +13,18 @@
         <action
             android:id="@+id/action_galleryPage_to_photoPage"
             app:destination="@id/photoPage" />
+        <action
+            android:id="@+id/action_galleryPage_to_pagerPhotoPage"
+            app:destination="@id/pagerPhotoPage" />
     </fragment>
     <fragment
         android:id="@+id/photoPage"
         android:name="cn.xu.gallery.PhotoPage"
         android:label="fragment_photo_page"
         tools:layout="@layout/fragment_photo_page" />
+    <fragment
+        android:id="@+id/pagerPhotoPage"
+        android:name="cn.xu.gallery.PagerPhotoPage"
+        android:label="fragment_pager_photo_page"
+        tools:layout="@layout/fragment_pager_photo_page" />
 </navigation>
