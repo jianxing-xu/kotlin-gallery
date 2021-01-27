@@ -4,4 +4,7 @@
     <item
         android:id="@+id/pullDown"
         android:title="pulldown refresh" />
+    <item
+        android:id="@+id/retry"
+        android:title="retry" />
 </menu>

@@ -29,7 +29,7 @@ class PhotoPage : Fragment() {
     ): View? {
         // 获取传过来的参数
         arguments?.getParcelable<PhotoItem>("PHOTO").also { photoItem = it }
-        Log.d("MY_DE", "onCreateView: ${photoItem?.fullUrl}")
+        Log.d("MY_DE", "onCreateView: ${photoItem?.src?.fullUrl}")
         return inflater.inflate(R.layout.fragment_photo_page, container, false)
     }
 
@@ -44,7 +44,7 @@ class PhotoPage : Fragment() {
             startShimmerAnimation()
         }
         with(this)
-            .load(photoItem?.fullUrl)
+            .load(photoItem?.src?.fullUrl)
             .placeholder(R.drawable.ic_baseline_insert_photo_24)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(

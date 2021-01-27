@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:adjustViewBounds="true"
+            android:contentDescription="图片"
             tools:srcCompat="@tools:sample/avatars" />
     </io.supercharge.shimmerlayout.ShimmerLayout>
 

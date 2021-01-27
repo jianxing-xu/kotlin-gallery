@@ -1,11 +1,14 @@
 package cn.xu.gallery
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -15,8 +18,7 @@ class GalleryPage : Fragment() {
 
     private var recyclerView: RecyclerView? = null
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
-    private var galleryViewModel: GalleryViewModel? = null
-
+    private val galleryViewModel by viewModels<GalleryViewModel>()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,8 +41,11 @@ class GalleryPage : Fragment() {
                 // 使用协程 至少加载一秒
                 GlobalScope.launch {
                     delay(1000)
-                    galleryViewModel?.fetchData()
+                    galleryViewModel.resetQuery()
                 }
+            }
+            R.id.retry -> {
+                galleryViewModel.retry()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -50,13 +55,8 @@ class GalleryPage : Fragment() {
         super.onActivityCreated(savedInstanceState)
         // 显示菜单
         setHasOptionsMenu(true)
-        // 初始化viewmodel
-        galleryViewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(GalleryViewModel::class.java)
         // 创建适配器
-        val galleryAdapter = GalleryAdapter()
+        val galleryAdapter = GalleryAdapter(galleryViewModel = galleryViewModel)
         // 获取下拉刷新布局
         swipeRefreshLayout = requireActivity().findViewById(R.id.swipeRefreshLayout)
         // 获取recyclerview
@@ -66,19 +66,26 @@ class GalleryPage : Fragment() {
             // 添加适配器
             adapter = galleryAdapter
             // 指定 recyclerview 布局为 Grid
-            layoutManager = GridLayoutManager(requireContext(), 2)
+            layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         }
 
-        // 监视列表
-        galleryViewModel?.photoList?.observe(viewLifecycleOwner, {
+        galleryViewModel.pagedListPhoto.observe(viewLifecycleOwner, {
             galleryAdapter.submitList(it)
             swipeRefreshLayout?.isRefreshing = false
         })
-        // 第一次进来拉去数据
-        galleryViewModel?.photoList?.value ?: galleryViewModel?.fetchData()
+
+        // 监视网络加载状态
+        galleryViewModel.networdStatus.observe(viewLifecycleOwner, {
+            Log.d("MY_DE", "网络状态：$it ")
+            galleryAdapter.updateNetWorkState(it)
+            // 第一次进来时显示加载中
+            swipeRefreshLayout?.isRefreshing = it == NetWorkState.INIT_LOAD
+        })
+
+
 
         swipeRefreshLayout?.setOnRefreshListener {
-            galleryViewModel?.fetchData()
+            galleryViewModel.resetQuery()
         }
     }
 
